@@ -24,8 +24,8 @@ app.get("/app/", (req, res, next) => {
 // Define other CRUD API endpoints using express.js and better-sqlite3
 // CREATE a new user (HTTP method POST) at endpoint /app/new/
 app.post("/app/new", (req,res) => {
-	const statement = db.prepare("Insert into userinfo (username, password) Values (?, ?)");
-	const info = statement.run(req.body.user, md5(req.body.pass))
+	const stmt = db.prepare("Insert into userinfo (user, pass) Values (?, ?)");
+	const info = stmt.run(req.body.user, md5(req.body.pass));
 	//res.json({"message": "Api works (200"});
 	res.status(201).send({message: info.changes + "record created: ID" + info.lastInsertRowid + "(201)"});
 	//res.status(200);
@@ -41,25 +41,25 @@ app.get("/app/users", (req, res) => {
 app.get("/app/user:id", (req, res) => {
 	const stmt = db.prepare("SELECT user, pass FROM userinfo where id is ?");
 	const info = stmt.get(req.params.id);
-	var userinfo = {id: parseInt(req.params.id), user: info["user"], pass: info["pass"]}
+	var userinfo = {id: parseInt(req.params.id), user: info["user"], pass: info["pass"]};
 	res.status(200).json(userinfo);
 });
 // UPDATE a single user (HTTP method PATCH) at endpoint /app/update/user/:id
-app.patch("/app/update/uder/:id", (req,res) => {
+app.patch("/app/update/user/:id", (req,res) => {
 	const stmt = db.prepare("UPDATE userinfo SET user = Coalesce(?, USER), pass = Coalesce(?, pass) Where id = ?");
 	const info = stmt.run(req.body.user, md5(req.body.pass), req.params.id);
-	res.status(200).send({message: info.changes + " record updated: ID " + req.params.id + "200"});
+	res.status(200).send({message: info.changes + " record updated: ID " + req.params.id + "(200)"});
 	
 }); 
 // DELETE a single user (HTTP method DELETE) at endpoint /app/delete/user/:id
 app.delete("/app/delete/user/:id/", (req,res) => {
 	const stmt = db.prepare("Delete from userinfo when id is ?");
-	const info = stmt.rrn(get.params.id);
-	res.status(200).send({message: info.changes + "record ID delted" + req.params.is + "200"});
+	const info = stmt.run(get.params.id);
+	res.status(200).send({message: info.changes + "record ID delted" + req.params.id + "(200)"});
 })
 
 // Default response for any other request
 app.use(function(req, res){
-	res.json({"message":"Endpoint not found. (404)"});
+	res.json({"message":"Endpoint blue. (404)"});
     res.status(404);
 });
