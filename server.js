@@ -13,7 +13,7 @@ app.use(express.json());
 HTTP_PORT = 5000
 // Start server
 app.listen(HTTP_PORT, () => {
-    console.log("Server running on port %PORT%".replace("%PORT%",HTTP_PORT))
+    // console.log("Server running on port %PORT%".replace("%PORT%",HTTP_PORT))
 });
 // READ (HTTP method GET) at root endpoint /app/
 app.get("/app/", (req, res, next) => {
@@ -24,7 +24,7 @@ app.get("/app/", (req, res, next) => {
 // Define other CRUD API endpoints using express.js and better-sqlite3
 // CREATE a new user (HTTP method POST) at endpoint /app/new/
 app.post("/app/new", (req,res) => {
-	const stmt = db.prepare("Insert into userinfo (user, pass) Values (?, ?)");
+	const stmt = db.prepare("INSERT INTO userinfo (user, pass) VALUES (?, ?)");
 	const info = stmt.run(req.body.user, md5(req.body.pass));
 	//res.json({"message": "Api works (200"});
 	res.status(201).send({message: info.changes + "record created: ID" + info.lastInsertRowid + "(201)"});
@@ -39,21 +39,21 @@ app.get("/app/users", (req, res) => {
 
 // READ a single user (HTTP method GET) at endpoint /app/user/:id
 app.get("/app/user:id", (req, res) => {
-	const stmt = db.prepare("SELECT user, pass FROM userinfo where id is ?");
+	const stmt = db.prepare("SELECT user, pass FROM userinfo WHERE id = ?");
 	const info = stmt.get(req.params.id);
 	var userinfo = {id: parseInt(req.params.id), user: info["user"], pass: info["pass"]};
 	res.status(200).json(userinfo);
 });
 // UPDATE a single user (HTTP method PATCH) at endpoint /app/update/user/:id
 app.patch("/app/update/user/:id", (req,res) => {
-	const stmt = db.prepare("UPDATE userinfo SET user = Coalesce(?, USER), pass = Coalesce(?, pass) Where id = ?");
+	const stmt = db.prepare("UPDATE userinfo SET user = COALESCE(?,user), pass = COALESCE(?,pass) WHERE id = ?");
 	const info = stmt.run(req.body.user, md5(req.body.pass), req.params.id);
 	res.status(200).send({message: info.changes + " record updated: ID " + req.params.id + "(200)"});
 	
 }); 
 // DELETE a single user (HTTP method DELETE) at endpoint /app/delete/user/:id
 app.delete("/app/delete/user/:id/", (req,res) => {
-	const stmt = db.prepare("Delete from userinfo when id is ?");
+	const stmt = db.prepare("DELETE FROM userinfo WHERE id = ?");
 	const info = stmt.run(get.params.id);
 	res.status(200).send({message: info.changes + "record ID delted" + req.params.id + "(200)"});
 })
